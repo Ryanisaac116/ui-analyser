@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>UI Bugs Analyser — Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top Loading Bar -->
+  <div id="topbar" aria-hidden="true"></div>
+
+  <!-- App Shell -->
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Primary">
+      <div class="brand">
+        <div class="logo">UI</div>
+        <div class="title">
+          <strong>UI Bugs</strong>
+          <span>Analyser Pro</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" data-tab="analyze" aria-controls="tab-analyze" aria-selected="true">Analyze</button>
+        <button class="nav-item" data-tab="batch" aria-controls="tab-batch">Batch</button>
+        <button class="nav-item" data-tab="reports" aria-controls="tab-reports">Reports</button>
+        <button class="nav-item" data-tab="settings" aria-controls="tab-settings">Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="themeToggle" class="ghost">☀️/🌙</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main" id="main">
+      <!-- Header -->
+      <header class="header">
+        <div class="breadcrumbs">Home / <span id="crumb">Analyze</span></div>
+        <div class="actions">
+          <button id="exportJsonTop" class="ghost">Download JSON</button>
+          <button id="exportCsvTop" class="ghost">Export CSV</button>
+          <button id="runQuick" class="primary">Quick Analyze</button>
+        </div>
+      </header>
+
+      <!-- Tab Panels -->
+      <section id="tab-analyze" class="panel active" role="tabpanel" aria-labelledby="Analyze">
+        <div class="hero-card gradient">
+          <div class="hero-text">
+            <h1>Audit any URL in seconds</h1>
+            <p>Get instant heuristics for accessibility, DOM health, and basic SEO. Heavy animations, clean look, bright gradients.</p>
+            <div class="inline-chips">
+              <span class="chip">A11y</span>
+              <span class="chip">SEO</span>
+              <span class="chip">Links</span>
+              <span class="chip">Contrast</span>
+            </div>
+          </div>
+          <div class="hero-cta">
+            <form id="form-single" class="row" novalidate>
+              <input id="url" type="url" placeholder="https://example.com" autocomplete="url" required aria-label="Website URL">
+              <label class="switch"><input type="checkbox" id="optLinks"><span>Check links/images</span></label>
+              <label class="switch"><input type="checkbox" id="optContrast"><span>Contrast heuristic</span></label>
+              <button class="primary lg" type="submit">Analyze</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="card-results" class="card animated-in">
+          <div class="card-head">
+            <div class="badges" id="meta"></div>
+            <div class="toolbar">
+              <select id="filter" class="select">
+                <option value="all">All severities</option>
+                <option value="error">Errors</option>
+                <option value="warn">Warnings</option>
+                <option value="note">Notes</option>
+              </select>
+              <input id="search" class="search" placeholder="Search…">
+              <button id="download" class="ghost">Download JSON</button>
+              <button id="toCsv" class="ghost">Export CSV</button>
+              <button id="copy" class="ghost">Copy</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="table" id="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Severity</th>
+                  <th>Issue</th>
+                  <th>Details</th>
+                  <th>Sample</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="empty-row"><td colspan="5">Run an analysis to see results here.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-batch" class="panel" role="tabpanel" aria-labelledby="Batch">
+        <div class="card gradient-soft">
+          <h2>Batch analysis</h2>
+          <p class="muted">Paste up to 20 URLs below. We’ll fetch them in a polite, rate-limited way.</p>
+          <form id="form-batch" class="row" novalidate>
+            <textarea id="urls" rows="6" placeholder="https://one.com\nhttps://two.com\nhttps://three.com"></textarea>
+            <div class="row tight">
+              <label class="switch"><input type="checkbox" id="optLinksB"><span>Check links/images</span></label>
+              <label class="switch"><input type="checkbox" id="optContrastB"><span>Contrast heuristic</span></label>
+              <button class="primary" type="submit">Run Batch</button>
+            </div>
+            <div class="progress" id="batchProgress">Idle</div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Batch results</h3>
+            <button id="batchCsv" class="ghost">Export CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table" id="batchTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>URL</th>
+                  <th>Severity</th>
+                  <th>Issue</th>
+                  <th>Details</th>
+                  <th>Sample</th>
+                  <th>Status</th>
+                  <th>Time (ms)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="empty-row"><td colspan="8">No batch results yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-reports" class="panel" role="tabpanel" aria-labelledby="Reports">
+        <div class="grid">
+          <div class="card">
+            <div class="card-head">
+              <h3>Summary</h3>
+              <div class="legend">
+                <span class="pill err">Errors</span>
+                <span class="pill warn">Warnings</span>
+                <span class="pill note">Notes</span>
+              </div>
+            </div>
+            <div id="summaryStats" class="stats">
+              <div class="stat"><div class="k">–</div><div class="v">Total issues</div></div>
+              <div class="stat"><div class="k">–</div><div class="v">Pages scanned</div></div>
+              <div class="stat"><div class="k">–</div><div class="v">Avg/ms</div></div>
+            </div>
+          </div>
+
+          <div class="card gradient-soft">
+            <h3>Issues over time</h3>
+            <div class="chart" id="trendChart" aria-label="Issues trend"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Recent runs</h3></div>
+            <div class="table-wrap">
+              <table class="table" id="historyTable">
+                <thead>
+                  <tr><th>#</th><th>URL</th><th>Errors</th><th>Warnings</th><th>Notes</th><th>Time</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="empty-row"><td colspan="6">Run something to populate history.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-settings" class="panel" role="tabpanel" aria-labelledby="Settings">
+        <div class="card">
+          <h2>Appearance</h2>
+          <div class="row">
+            <div class="palette" aria-label="Color palette">
+              <button class="swatch" data-pal="sunset" title="Sunset"></button>
+              <button class="swatch" data-pal="ocean" title="Ocean"></button>
+              <button class="swatch" data-pal="forest" title="Forest"></button>
+              <button class="swatch" data-pal="royal" title="Royal"></button>
+              <button class="swatch" data-pal="candy" title="Candy"></button>
+            </div>
+            <button id="resetUI" class="ghost">Reset UI</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Behaviour</h2>
+          <div class="row tight">
+            <label class="switch"><input type="checkbox" id="prefAnimations" checked><span>Enable heavy animations</span></label>
+            <label class="switch"><input type="checkbox" id="prefHints" checked><span>Show hints and toasts</span></label>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">Made for fast, professional UI checks • Exportable • Keyboard friendly</footer>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
