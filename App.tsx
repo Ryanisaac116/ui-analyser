@@ -1,13 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Bug, MessageSquare, Zap, Send, X } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, Bug, MessageSquare, Zap, Send, X, Search, Bot } from 'lucide-react';
+
+// Define a type for our message objects for better type safety
+type Message = {
+  type: 'bot' | 'user';
+  text: string;
+};
 
 export default function App() {
   const [showChat, setShowChat] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     { type: 'bot', text: 'Hello! I\'m your UI Analysis Assistant. How can I help you debug your interface today?' }
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Automatically scroll to the bottom of the chat when new messages are added
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!inputText.trim()) return;
@@ -17,8 +33,21 @@ export default function App() {
     setMessages(prev => [...prev, { type: 'user', text: userMessage }]);
     setIsLoading(true);
 
+    // Use an environment variable for the API URL
+    const apiUrl = import.meta.env.VITE_FLOWISE_API_URL;
+    
+    if (!apiUrl) {
+        console.error("VITE_FLOWISE_API_URL is not defined in your .env file.");
+        setMessages(prev => [...prev, {
+            type: 'bot',
+            text: "Configuration error: The API URL is not set. Please contact the administrator."
+        }]);
+        setIsLoading(false);
+        return;
+    }
+
     try {
-      const response = await fetch('http://localhost:3000/api/v1/prediction/583eff37-3556-411a-8a6f-4fab2b967f80', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,20 +63,21 @@ export default function App() {
       }
 
       const data = await response.json();
-      const botResponse = data.text || data.answer || data.output || data.response || 'I received your message!';
+      // Safely access the response text
+      const botResponse = data?.text || 'I received your message, but the response was empty.';
       setMessages(prev => [...prev, { type: 'bot', text: botResponse }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Connection error:', error);
       setMessages(prev => [...prev, { 
         type: 'bot', 
-        text: `Connection error: ${error.message}. Please check:\n1. Flowise is running on http://localhost:3000\n2. The chatflow ID is correct\n3. CORS is enabled in Flowise settings` 
+        text: `Connection error: ${error.message}. Please check:\n1. Flowise is running.\n2. The chatflow ID is correct.\n3. CORS is enabled in Flowise settings.` 
       }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -55,17 +85,17 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* Grid Background */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(59,130,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.1)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
       
       <div className="relative z-10">
         {/* Header */}
-        <header className="border-b border-slate-700/50 backdrop-blur-sm bg-slate-900/50">
+        <header className="sticky top-0 border-b border-slate-700/50 backdrop-blur-sm bg-slate-900/50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-xl">
-                🔍
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Search size={22} />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent">
                 UI Analyser
@@ -82,7 +112,7 @@ export default function App() {
         </header>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <main className="max-w-7xl mx-auto px-6 py-12">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-blue-400 bg-clip-text text-transparent mb-4">
@@ -167,12 +197,12 @@ export default function App() {
 
           {/* Chat Interface */}
           {showChat && (
-            <div className="mt-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden">
+            <div className="mt-8 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden flex flex-col">
               {/* Chat Header */}
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 flex items-center justify-between">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    🤖
+                    <Bot size={24} />
                   </div>
                   <div>
                     <h3 className="text-white font-semibold">UI Analysis Assistant</h3>
@@ -191,7 +221,7 @@ export default function App() {
               <div className="h-96 overflow-y-auto p-6 space-y-4">
                 {messages.map((msg, idx) => (
                   <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-2xl p-4 ${
+                    <div className={`max-w-[80%] rounded-2xl p-4 whitespace-pre-wrap ${
                       msg.type === 'user' 
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
                         : 'bg-slate-700/50 text-slate-200'
@@ -211,10 +241,11 @@ export default function App() {
                     </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Chat Input */}
-              <div className="border-t border-slate-700/50 p-4">
+              <div className="border-t border-slate-700/50 p-4 flex-shrink-0">
                 <div className="flex gap-3">
                   <input
                     type="text"
@@ -223,6 +254,7 @@ export default function App() {
                     onKeyPress={handleKeyPress}
                     placeholder="Describe your UI issue..."
                     className="flex-1 bg-slate-700/50 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400"
+                    disabled={isLoading}
                   />
                   <button
                     onClick={sendMessage}
@@ -282,7 +314,7 @@ export default function App() {
               </ul>
             </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
