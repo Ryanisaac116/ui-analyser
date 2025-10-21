@@ -1,0 +1,420 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+// This component contains the styles and structure from your original uihome.html file.
+// It serves as the landing page for your application.
+
+export default function Home() {
+  // The CSS from uihome.html is embedded here for simplicity.
+  const pageStyles = `
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        color: #e0e0e0;
+        overflow-x: hidden;
+    }
+
+    .grid-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    header {
+        padding: 30px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    nav {
+        display: flex;
+        gap: 30px;
+    }
+
+    nav a {
+        color: #e0e0e0;
+        text-decoration: none;
+        font-size: 16px;
+        transition: color 0.3s;
+        position: relative;
+    }
+
+    nav a:hover {
+        color: #3b82f6;
+    }
+
+    nav a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #3b82f6;
+        transition: width 0.3s;
+    }
+
+    nav a:hover::after {
+        width: 100%;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 100px 0;
+        position: relative;
+    }
+
+    .hero h1 {
+        font-size: 64px;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #ffffff, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInUp 1s ease;
+    }
+
+    .hero p {
+        font-size: 20px;
+        color: #a0a0a0;
+        margin-bottom: 40px;
+        animation: fadeInUp 1s ease 0.2s both;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        animation: fadeInUp 1s ease 0.4s both;
+    }
+
+    .btn {
+        padding: 16px 40px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #3b82f6;
+        border: 2px solid #3b82f6;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(59, 130, 246, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        padding: 80px 0;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 40px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .feature-card:hover::before {
+        left: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #ffffff;
+    }
+
+    .feature-card p {
+        color: #a0a0a0;
+        line-height: 1.6;
+    }
+
+    .code-preview {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 12px;
+        padding: 30px;
+        margin: 80px 0;
+        position: relative;
+    }
+
+    .code-preview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 12px 12px 0 0;
+        border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .code-dots {
+        position: absolute;
+        top: 10px;
+        left: 15px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .code-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #3b82f6;
+    }
+
+    .code-content {
+        margin-top: 20px;
+        font-family: 'Courier New', monospace;
+        color: #61dafb;
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: left;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .floating-element {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 42px;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+        }
+
+        nav {
+            display: none;
+        }
+    }
+  `;
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: pageStyles }} />
+      <div className="grid-background"></div>
+      <div className="floating-element"></div>
+      <div className="floating-element"></div>
+
+      <div className="container">
+        <header>
+          <div className="logo">
+            <div className="logo-icon">{'UI'}</div>
+            UI Analyser
+          </div>
+          <nav>
+            <a href="#features">Features</a>
+            <a href="#docs">Documentation</a>
+          </nav>
+        </header>
+        <section className="hero">
+          <h1>Debug UI with Precision</h1>
+          <p>Catch visual bugs, validate responsive designs, and ensure pixel-perfect interfaces</p>
+          <div className="cta-buttons">
+            <Link to="/app" className="btn btn-primary">Start Analyzing</Link>
+            <a href="#" className="btn btn-secondary">View Demo</a>
+          </div>
+        </section>
+
+        <div className="code-preview">
+          <div className="code-dots">
+            <div className="code-dot"></div>
+            <div className="code-dot"></div>
+            <div className="code-dot"></div>
+          </div>
+          <div className="code-content">
+            <span style={{ color: '#c678dd' }}>async function</span> <span style={{ color: '#61dafb' }}>query</span>(<span style={{ color: '#d19a66' }}>data</span>) {'{'}<br />
+            &nbsp;&nbsp;<span style={{ color: '#c678dd' }}>const</span> response = <span style={{ color: '#c678dd' }}>await</span> <span style={{ color: '#61dafb' }}>fetch</span>(<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#98c379' }}>"http://localhost:3000/api/v1/prediction/342ded6c-6fb9-4750-82d5-8380dc576885"</span>,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;{'{'}<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#d19a66' }}>method</span>: <span style={{ color: '#98c379' }}>"POST"</span>,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#d19a66' }}>headers</span>: {'{'}<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#98c379' }}>"Content-Type"</span>: <span style={{ color: '#98c379' }}>"application/json"</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'}'},<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#d19a66' }}>body</span>: JSON.<span style={{ color: '#61dafb' }}>stringify</span>(data)<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;{'}'}<br />
+            &nbsp;&nbsp;);<br />
+            &nbsp;&nbsp;<span style={{ color: '#c678dd' }}>const</span> result = <span style={{ color: '#c678dd' }}>await</span> response.<span style={{ color: '#61dafb' }}>json</span>();<br />
+            &nbsp;&nbsp;<span style={{ color: '#c678dd' }}>return</span> result;<br />
+            {'}'}<br />
+            <br />
+            <span style={{ color: '#61dafb' }}>query</span>({'{'}"<span style={{ color: '#d19a66' }}>question</span>": <span style={{ color: '#98c379' }}>"Hey, how are you?"</span>{'}'}).<span style={{ color: '#61dafb' }}>then</span>((<span style={{ color: '#d19a66' }}>response</span>) {'=>'} {'{'}<br />
+            &nbsp;&nbsp;console.<span style={{ color: '#61dafb' }}>log</span>(response);<br />
+            {'}'});
+          </div>
+        </div>
+
+        <section className="features" id="features">
+          <div className="feature-card">
+            <div className="feature-icon">🔍</div>
+            <h3>Bug Detection</h3>
+            <p>Automatically identify visual inconsistencies, layout breaks, and rendering issues across your application.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">📊</div>
+            <h3>Bug severity</h3>
+            <p>Know the severity of the bug: low → medium → high</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">⏱️</div>
+            <h3>Real-time Analysis</h3>
+            <p>Get instant feedback as you develop with live UI monitoring and change detection capabilities.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">♿</div>
+            <h3>Accessibility Checks</h3>
+            <p>Ensure your interface meets WCAG standards with automated accessibility testing and recommendations.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">📸</div>
+            <h3>Visual Regression</h3>
+            <p>Compare UI snapshots over time to catch unintended visual changes before they reach production.</p>
+          </div>
+
+          <div className="feature-card">
+            <div className="feature-icon">🎨</div>
+            <h3>Design Consistency</h3>
+            <p>Verify spacing, colors, typography, and component alignment match your design system specifications.</p>
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
+
